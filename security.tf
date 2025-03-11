@@ -56,3 +56,31 @@ resource "aws_security_group" "private_sg" {
     Name = "private-sg"
   }
 }
+
+# Security group for RDS
+resource "aws_security_group" "rds_sg" {
+  name        = "rds-sg"
+  description = "Security group for RDS database"
+  vpc_id      = aws_vpc.main.id
+
+  # MariaDB/MySQL standard port - only allow from nginx server
+  ingress {
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
+    security_groups = [aws_security_group.nginx_sg.id]
+    description     = "MariaDB access from web server"
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow all outbound traffic"
+  }
+
+  tags = {
+    Name = "rds-security-group"
+  }
+}
