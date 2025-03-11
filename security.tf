@@ -75,7 +75,7 @@ resource "aws_security_group" "db_sg" {
     description     = "MariaDB access from web servers"
   }
 
-  # MariaDB/MySQL standard port - allow from anywhere (Internet)
+  # MariaDB/MySQL standard port - allow from anywhere
   ingress {
     from_port   = 3306
     to_port     = 3306
