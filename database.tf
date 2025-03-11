@@ -1,4 +1,3 @@
-# RDS subnet group - RDS requires at least 2 subnets in different AZs
 resource "aws_db_subnet_group" "rds_subnet_group" {
   name       = "rds-subnet-group"
   subnet_ids = [aws_subnet.public.id, aws_subnet.private.id]
@@ -24,7 +23,6 @@ resource "aws_db_instance" "db" {
   publicly_accessible    = true
   skip_final_snapshot    = true
   
-  # Enable encryption at rest for secure communications
   storage_encrypted = true
   
   tags = {
@@ -32,7 +30,6 @@ resource "aws_db_instance" "db" {
   }
 }
 
-# Output the endpoint for easy access
 output "rds_endpoint" {
   value       = aws_db_instance.db.endpoint
   description = "The endpoint of the RDS database"

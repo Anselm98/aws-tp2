@@ -18,11 +18,11 @@ resource "aws_instance" "nginx_server" {
               <!DOCTYPE html>
               <html>
               <head>
-                  <title>TP1</title>
+                  <title>TP2</title>
               </head>
               <body>
                   <h1>Bienvenue !</h1>
-                  <p>Ce site a ete deploye avec Terraform pour le TP1.</p>
+                  <p>Ce site a ete deploye avec Terraform pour le TP2.</p>
               </body>
               </html>
               HTMLEOF
@@ -40,13 +40,6 @@ resource "aws_instance" "private_instance" {
   vpc_security_group_ids = [aws_security_group.private_sg.id]
   subnet_id              = aws_subnet.private.id
   key_name               = "Fedora"
-  
-  user_data = <<-EOF
-              #!/bin/bash
-              apt-get update
-              apt-get install -y curl
-              echo "Private instance setup complete" > /home/ubuntu/setup_complete.txt
-              EOF
   
   tags = {
     Name = "${var.instance_name}-private"
