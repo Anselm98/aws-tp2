@@ -63,13 +63,22 @@ resource "aws_security_group" "rds_sg" {
   description = "Security group for RDS database"
   vpc_id      = aws_vpc.main.id
 
-  # MariaDB/MySQL standard port - only allow from nginx server
+  # MariaDB/MySQL standard port - allow from nginx server
   ingress {
     from_port       = 3306
     to_port         = 3306
     protocol        = "tcp"
     security_groups = [aws_security_group.nginx_sg.id]
     description     = "MariaDB access from web server"
+  }
+
+  # MariaDB/MySQL standard port - allow from anywhere (Internet)
+  ingress {
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "MariaDB access from Internet"
   }
 
   egress {
