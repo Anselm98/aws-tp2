@@ -1,6 +1,7 @@
-resource "aws_security_group" "nginx_sg" {
-  name        = "nginx-sg"
-  description = "Allow HTTP, SSH traffic and MySQL connections to RDS"
+# Web server security group
+resource "aws_security_group" "web_sg" {
+  name        = "web-sg"
+  description = "Allow HTTP, SSH traffic for web servers"
   vpc_id      = aws_vpc.main.id
   
   ingress {
@@ -27,21 +28,23 @@ resource "aws_security_group" "nginx_sg" {
     description = "Allow all outbound traffic"
   }
 
-  # No need to add explicit MySQL outbound rule since we allow all outbound traffic
+  tags = {
+    Name = "web-sg"
+  }
 }
 
-# Security group for private instance
+# Private instance security group
 resource "aws_security_group" "private_sg" {
   name        = "private-sg"
-  description = "Security group for private instance"
+  description = "Security group for private instances"
   vpc_id      = aws_vpc.main.id
   
   ingress {
     from_port       = 22
     to_port         = 22
     protocol        = "tcp"
-    security_groups = [aws_security_group.nginx_sg.id]
-    description     = "SSH from public instances"
+    security_groups = [aws_security_group.web_sg.id]
+    description     = "SSH from web instances"
   }
   
   egress {
@@ -57,19 +60,19 @@ resource "aws_security_group" "private_sg" {
   }
 }
 
-# Security group for RDS
-resource "aws_security_group" "rds_sg" {
-  name        = "rds-sg"
-  description = "Security group for RDS database"
+# Database security group
+resource "aws_security_group" "db_sg" {
+  name        = "db-sg"
+  description = "Security group for database instances"
   vpc_id      = aws_vpc.main.id
 
-  # MariaDB/MySQL standard port - allow from nginx server
+  # MariaDB/MySQL standard port - allow from web server
   ingress {
     from_port       = 3306
     to_port         = 3306
     protocol        = "tcp"
-    security_groups = [aws_security_group.nginx_sg.id]
-    description     = "MariaDB access from web server"
+    security_groups = [aws_security_group.web_sg.id]
+    description     = "MariaDB access from web servers"
   }
 
   # MariaDB/MySQL standard port - allow from anywhere (Internet)
@@ -90,6 +93,6 @@ resource "aws_security_group" "rds_sg" {
   }
 
   tags = {
-    Name = "rds-security-group"
+    Name = "db-sg"
   }
 }
