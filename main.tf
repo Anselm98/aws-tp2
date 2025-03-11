@@ -1,7 +1,9 @@
+# Public instance in the public subnet
 resource "aws_instance" "nginx_server" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.nginx_sg.id]
+  subnet_id              = aws_subnet.public.id
   key_name               = "Fedora"
   
   user_data = <<-EOF
@@ -28,5 +30,25 @@ resource "aws_instance" "nginx_server" {
   
   tags = {
     Name = var.instance_name
+  }
+}
+
+# Private instance in the private subnet
+resource "aws_instance" "private_instance" {
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = var.instance_type
+  vpc_security_group_ids = [aws_security_group.private_sg.id]
+  subnet_id              = aws_subnet.private.id
+  key_name               = "Fedora"
+  
+  user_data = <<-EOF
+              #!/bin/bash
+              apt-get update
+              apt-get install -y curl
+              echo "Private instance setup complete" > /home/ubuntu/setup_complete.txt
+              EOF
+  
+  tags = {
+    Name = "${var.instance_name}-private"
   }
 }
