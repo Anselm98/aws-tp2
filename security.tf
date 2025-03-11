@@ -1,6 +1,6 @@
 resource "aws_security_group" "nginx_sg" {
   name        = "nginx-sg"
-  description = "Allow HTTP and SSH traffic"
+  description = "Allow HTTP, SSH traffic and MySQL connections to RDS"
   vpc_id      = aws_vpc.main.id
   
   ingress {
@@ -26,6 +26,8 @@ resource "aws_security_group" "nginx_sg" {
     cidr_blocks = ["0.0.0.0/0"]
     description = "Allow all outbound traffic"
   }
+
+  # No need to add explicit MySQL outbound rule since we allow all outbound traffic
 }
 
 # Security group for private instance
